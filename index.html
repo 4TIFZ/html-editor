@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Editor with Preview</title>
+    <style>
+        @font-face {
+            font-family: 'LemonMilk';
+            src: url('lemon_milk.otf') format('opentype');
+        }
+        body {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eaeaea;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            width: 100%;
+        }
+        #editor, #preview {
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #editor {
+            border-right: 2px solid #ddd;
+        }
+        textarea {
+            width: 100%;
+            height: calc(100% - 60px);
+            padding: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: none;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            background-color: #f9f9f9;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin: 0 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="editor">
+            <h1>HTML Editor</h1>
+            <textarea id="htmlInput" placeholder="Type your HTML here..."></textarea>
+            <button onclick="updatePreview()">Update Preview</button>
+        </div>
+        <div id="preview">
+            <h1>Preview</h1>
+            <iframe id="previewFrame"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function updatePreview() {
+            const htmlContent = document.getElementById('htmlInput').value;
+            const previewFrame = document.getElementById('previewFrame').contentWindow.document;
+            previewFrame.open();
+            previewFrame.write(htmlContent);
+            previewFrame.close();
+        }
+    </script>
+</body>
+</html>
