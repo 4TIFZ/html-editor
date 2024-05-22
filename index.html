@@ -24,6 +24,7 @@
             flex: 1;
             height: 100%;
             width: 100%;
+            position: relative;
         }
         #editor, #preview {
             padding: 20px;
@@ -31,6 +32,7 @@
             overflow: auto;
             background-color: #fff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-width: 100px;
         }
         #editor {
             border-right: 2px solid #ddd;
@@ -92,8 +94,11 @@
             width: 5px;
             background-color: #ddd;
             cursor: ew-resize;
-            resize: horizontal;
-            overflow: auto;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .dark-theme {
             background-color: #000;
@@ -190,9 +195,23 @@
         function onMouseMove(event) {
             if (!isResizing) return;
 
-            let offsetRight = document.body.offsetWidth - (event.clientX - resizer.offsetWidth / 2);
-            leftSide.style.flex = '0 0 ' + (event.clientX - resizer.offsetWidth / 2) + 'px';
-            rightSide.style.flex = '0 0 ' + offsetRight + 'px';
+            const minWidth = 100; // Minimum width for the editor and preview sections
+            const maxWidth = document.body.offsetWidth - minWidth;
+
+            let newLeftWidth = event.clientX;
+            let newRightWidth = document.body.offsetWidth - newLeftWidth;
+
+            if (newLeftWidth < minWidth) {
+                newLeftWidth = minWidth;
+                newRightWidth = document.body.offsetWidth - minWidth;
+            } else if (newRightWidth < minWidth) {
+                newRightWidth = minWidth;
+                newLeftWidth = document.body.offsetWidth - minWidth;
+            }
+
+            leftSide.style.flex = '0 0 ' + newLeftWidth + 'px';
+            rightSide.style.flex = '0 0 ' + newRightWidth + 'px';
+            resizer.style.left = newLeftWidth + 'px';
         }
 
         function onMouseUp() {
