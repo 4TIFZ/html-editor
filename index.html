@@ -11,12 +11,13 @@
         }
         body {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             height: 100vh;
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eaeaea;
             font-family: 'LemonMilk', Arial, sans-serif;
+            background-color: #eaeaea;
+            color: #000;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         .container {
             display: flex;
@@ -25,7 +26,6 @@
             width: 100%;
         }
         #editor, #preview {
-            width: 50%;
             padding: 20px;
             box-sizing: border-box;
             overflow: auto;
@@ -47,24 +47,25 @@
             font-size: 14px;
             background-color: #f9f9f9;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-            font-family: 'LemonMilk', Arial, sans-serif;
         }
         button {
             width: 100%;
             padding: 12px;
             margin-top: 10px;
             box-sizing: border-box;
-            background-color: #4CAF50;
-            color: white;
+            background-color: #fff;
+            color: #000;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s ease;
+            font-family: 'LemonMilk', Arial, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #000;
+            color: #fff;
         }
         iframe {
             width: 100%;
@@ -77,17 +78,67 @@
             color: #333;
             font-size: 24px;
             margin: 0 0 20px;
+            transition: color 0.3s ease;
+        }
+        .theme-toggle {
+            background-color: #fff;
+            color: #000;
+        }
+        .theme-toggle:hover {
+            background-color: #000;
+            color: #fff;
+        }
+        .resizer {
+            width: 5px;
+            background-color: #ddd;
+            cursor: ew-resize;
+            resize: horizontal;
+            overflow: auto;
+        }
+        .dark-theme {
+            background-color: #000;
+            color: #fff;
+        }
+        .dark-theme #editor, .dark-theme #preview {
+            background-color: #222;
+            color: #fff;
+        }
+        .dark-theme textarea {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+        }
+        .dark-theme button {
+            background-color: #000;
+            color: #fff;
+        }
+        .dark-theme button:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        .dark-theme .theme-toggle {
+            background-color: #000;
+            color: #fff;
+        }
+        .dark-theme .theme-toggle:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        .dark-theme h1 {
+            color: #fff;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="editor">
+        <div id="editor" style="flex: 1;">
             <h1>HTML Editor</h1>
             <textarea id="htmlInput" placeholder="Type your HTML here..."></textarea>
             <button onclick="updatePreview()">Update Preview</button>
+            <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
         </div>
-        <div id="preview">
+        <div class="resizer"></div>
+        <div id="preview" style="flex: 1;">
             <h1>Preview</h1>
             <iframe id="previewFrame"></iframe>
         </div>
@@ -100,6 +151,55 @@
             previewFrame.open();
             previewFrame.write(htmlContent);
             previewFrame.close();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const themeToggle = document.getElementById('themeToggle');
+            let isDarkTheme = false;
+
+            themeToggle.addEventListener('click', function() {
+                isDarkTheme = !isDarkTheme;
+                updateTheme();
+            });
+
+            function updateTheme() {
+                if (isDarkTheme) {
+                    document.body.classList.add('dark-theme');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                }
+            }
+
+            // Initialize theme
+            updateTheme();
+        });
+
+        const resizer = document.querySelector('.resizer');
+        const leftSide = resizer.previousElementSibling;
+        const rightSide = resizer.nextElementSibling;
+
+        let isResizing = false;
+
+        resizer.addEventListener('mousedown', (event) => {
+            isResizing = true;
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        function onMouseMove(event) {
+            if (!isResizing) return;
+
+            let offsetRight = document.body.offsetWidth - (event.clientX - resizer.offsetWidth / 2);
+            leftSide.style.flex = '0 0 ' + (event.clientX - resizer.offsetWidth / 2) + 'px';
+            rightSide.style.flex = '0 0 ' + offsetRight + 'px';
+        }
+
+        function onMouseUp() {
+            isResizing = false;
+
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
         }
     </script>
 </body>
