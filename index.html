@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Editor with Preview</title>
+    <title>HTML Editor</title>
     <link rel="icon" type="image/x-icon" href="html-editor-logo.png">
     <style>
         @font-face {
@@ -11,216 +11,131 @@
             src: url('lemon_milk.otf') format('opentype');
         }
         body {
+            font-family: 'LemonMilk', Arial, sans-serif; /* Lemon Milk font */
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            align-items: center;
             margin: 0;
-            font-family: 'LemonMilk', Arial, sans-serif;
-            background-color: #eaeaea;
-            color: #000;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .container {
-            display: flex;
-            flex: 1;
-            height: 100%;
-            width: 100%;
-            position: relative;
-        }
-        #editor, #preview {
             padding: 20px;
+            background-color: #f7f7f7;
+            color: #333;
+            height: 100vh;
             box-sizing: border-box;
-            overflow: auto;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            min-width: 100px;
-        }
-        #editor {
-            border-right: 2px solid #ddd;
-        }
-        textarea {
-            width: 100%;
-            height: calc(100% - 60px);
-            padding: 15px;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            resize: none;
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            background-color: #f9f9f9;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            box-sizing: border-box;
-            background-color: #fff;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-family: 'LemonMilk', Arial, sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        button:hover {
-            background-color: #000;
-            color: #fff;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: #f9f9f9;
         }
         h1 {
-            text-align: center;
-            color: #333;
-            font-size: 24px;
-            margin: 0 0 20px;
-            transition: color 0.3s ease;
+            font-family: 'LemonMilk', Arial, sans-serif; /* Lemon Milk font */
+            margin-bottom: 5px;
         }
-        .theme-toggle {
+        #container {
+            display: flex;
+            flex: 1;
+            width: 90%;
+            max-width: 1200px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #editorContainer, #outputContainer {
+            width: 50%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        #editor {
+            width: 100%;
+            height: calc(100vh - 200px);
+            border: 1px solid #ccc;
             background-color: #fff;
-            color: #000;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            margin: 0;
         }
-        .theme-toggle:hover {
-            background-color: #000;
-            color: #fff;
+        #runButton, #saveButton {
+            font-family: 'LemonMilk', Arial, sans-serif; /* Lemon Milk font */
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 5px;
         }
-        .resizer {
-            width: 5px;
-            background-color: #ddd;
-            cursor: ew-resize;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .dark-theme {
-            background-color: #000;
-            color: #fff;
-        }
-        .dark-theme #editor, .dark-theme #preview {
-            background-color: #222;
-            color: #fff;
-        }
-        .dark-theme textarea {
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #555;
-        }
-        .dark-theme button {
-            background-color: #000;
-            color: #fff;
-        }
-        .dark-theme button:hover {
+        #output {
+            width: 100%;
+            height: calc(100vh - 200px);
+            border: 1px solid #ccc;
             background-color: #fff;
-            color: #000;
+            padding: 15px;
+            font-family: monospace;
+            overflow: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            margin: 0;
         }
-        .dark-theme .theme-toggle {
-            background-color: #000;
-            color: #fff;
+        #buttonContainer {
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
-        .dark-theme .theme-toggle:hover {
-            background-color: #fff;
-            color: #000;
-        }
-        .dark-theme h1 {
-            color: #fff;
+        #footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
         }
     </style>
+    <script>
+        function runCode() {
+            let editor = document.getElementById('editor');
+            let output = document.getElementById('output');
+            output.innerHTML = editor.innerText;
+        }
+
+        function saveCode() {
+            let editor = document.getElementById('editor');
+            let textToSave = editor.innerText;
+            let blob = new Blob([textToSave], { type: 'text/html' });
+            let link = document.createElement('a');
+            link.download = 'index.html';
+            link.href = window.URL.createObjectURL(blob);
+            link.click();
+        }
+
+        function updateCopyright() {
+            const year = new Date().getFullYear();
+            document.getElementById('footer').innerText = `© ${year} GH-UNFAZD. ALL RIGHTS RESERVED. [maybe]`;
+        }
+
+        window.onload = updateCopyright;
+    </script>
 </head>
 <body>
-    <div class="container">
-        <div id="editor" style="flex: 1;">
-            <h1>HTML Editor</h1>
-            <textarea id="htmlInput" placeholder="Type your HTML here..."></textarea>
-            <button onclick="updatePreview()">Update Preview</button>
-            <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+    <h1>HTML Editor</h1>
+    <div id="container">
+        <div id="editorContainer">
+            <div id="editor" contenteditable="true"><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+</html>
+            </div>
         </div>
-        <div class="resizer"></div>
-        <div id="preview" style="flex: 1;">
-            <h1>Preview</h1>
-            <iframe id="previewFrame"></iframe>
+        <div id="outputContainer">
+            <div id="output"></div>
         </div>
     </div>
-
-    <script>
-        function updatePreview() {
-            const htmlContent = document.getElementById('htmlInput').value;
-            const previewFrame = document.getElementById('previewFrame').contentWindow.document;
-            previewFrame.open();
-            previewFrame.write(htmlContent);
-            previewFrame.close();
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const themeToggle = document.getElementById('themeToggle');
-            let isDarkTheme = false;
-
-            themeToggle.addEventListener('click', function() {
-                isDarkTheme = !isDarkTheme;
-                updateTheme();
-            });
-
-            function updateTheme() {
-                if (isDarkTheme) {
-                    document.body.classList.add('dark-theme');
-                } else {
-                    document.body.classList.remove('dark-theme');
-                }
-            }
-
-            // Initialize theme
-            updateTheme();
-        });
-
-        const resizer = document.querySelector('.resizer');
-        const leftSide = resizer.previousElementSibling;
-        const rightSide = resizer.nextElementSibling;
-
-        let isResizing = false;
-
-        resizer.addEventListener('mousedown', (event) => {
-            isResizing = true;
-
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-        });
-
-        function onMouseMove(event) {
-            if (!isResizing) return;
-
-            const minWidth = 100; // Minimum width for the editor and preview sections
-            const maxWidth = document.body.offsetWidth - minWidth;
-
-            let newLeftWidth = event.clientX;
-            let newRightWidth = document.body.offsetWidth - newLeftWidth;
-
-            if (newLeftWidth < minWidth) {
-                newLeftWidth = minWidth;
-                newRightWidth = document.body.offsetWidth - minWidth;
-            } else if (newRightWidth < minWidth) {
-                newRightWidth = minWidth;
-                newLeftWidth = document.body.offsetWidth - minWidth;
-            }
-
-            leftSide.style.flex = '0 0 ' + newLeftWidth + 'px';
-            rightSide.style.flex = '0 0 ' + newRightWidth + 'px';
-            resizer.style.left = newLeftWidth + 'px';
-        }
-
-        function onMouseUp() {
-            isResizing = false;
-
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        }
-    </script>
+    <div id="buttonContainer">
+        <button id="runButton" onclick="runCode()">Run</button>
+        <button id="saveButton" onclick="saveCode()">Save to device</button>
+    </div>
+    <div id="footer"></div>
 </body>
 </html>
